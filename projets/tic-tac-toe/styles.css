@@ -1,10 +1,44 @@
 body {
   font-family: sans-serif;
   text-align: center;
-  background: #f0f0f0;
+  background: #2e3162;
+  font-family: Boldonse;
+  overflow: hidden;
 }
+#explosion-container {
+  position: fixed; /* ← important : fixe par rapport à l’écran */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.particle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid;
+  opacity: 0.9;
+  animation: explode 1s ease-out forwards;
+}
+
+@keyframes explode {
+  to {
+    transform: translate(var(--x), var(--y)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
 h1 {
   margin-top: 20px;
+  color: #797b97;
+}
+
+h2 {
+  color: #b9bdd3;
 }
 .board {
   display: grid;
@@ -13,10 +47,11 @@ h1 {
   gap: 5px;
   margin: 20px auto;
   width: max-content;
+  background-color: #1c1e3d;
 }
 .cell {
-  background: white;
-  border: 2px solid #333;
+  background: #1c1e3d;
+  outline: 10px solid #2e3162;
   font-size: 3rem;
   display: flex;
   align-items: center;
@@ -29,10 +64,58 @@ h1 {
 .status {
   margin-top: 20px;
   font-size: 1.5rem;
+  color: #797b97;
 }
 .reset {
   margin-top: 20px;
   padding: 10px 20px;
   font-size: 1rem;
+  font-family: boldonse;
+  background-color: #171831;
   cursor: pointer;
+  color: #797b97;
+  border-radius: 10px;
+  border: none;
+}
+.symbol {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.circle {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background: lightgray;
+  border-radius: 50%;
+}
+
+@keyframes victory-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+}
+
+.victory {
+  animation: victory-pulse 1s ease-in-out infinite;
+  color: gold;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+/* Curseur personnalisé pour étoile */
+.board.star-cursor .cell:not(.taken):hover {
+  cursor: url("etoile.png") 16 16, pointer; /* remplace par ton PNG d’étoile */
+}
+
+/* Curseur personnalisé pour lune */
+.board.moon-cursor .cell:not(.taken):hover {
+  cursor: url("lune.png") 16 16, pointer; /* remplace par ton PNG de lune */
 }
