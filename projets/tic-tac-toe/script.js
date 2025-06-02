@@ -8,12 +8,12 @@ let grid = Array(9).fill(null);
 const winningCombinations = [
   [0, 1, 2],
   [3, 4, 5],
-  [6, 7, 8], // lignes
+  [6, 7, 8],
   [0, 3, 6],
   [1, 4, 7],
-  [2, 5, 8], // colonnes
+  [2, 5, 8],
   [0, 4, 8],
-  [2, 4, 6], // diagonales
+  [2, 4, 6],
 ];
 
 function checkWinner() {
@@ -27,34 +27,55 @@ function checkWinner() {
   return null;
 }
 
+function getPlayerLabel(player) {
+  return player === "X" ? "étoile" : "lune";
+}
+
 function handleClick(e) {
   const index = e.target.dataset.index;
   if (grid[index] || checkWinner()) return;
 
   grid[index] = currentPlayer;
-  e.target.textContent = currentPlayer;
+  e.target.innerHTML = `<img src="${
+    currentPlayer === "X" ? "etoile.png" : "lune.png"
+  }" alt="${getPlayerLabel(currentPlayer)}" class="symbol">`;
+
   e.target.classList.add("taken");
 
   const winner = checkWinner();
   if (!statusText) return;
-  if (winner) {
-    statusText.textContent =
-      winner === "Egalité" ? "Match nul !" : `Joueur ${winner} a gagné !`;
+
+  if (winner === "Egalité") {
+    statusText.textContent = "Match nul !";
+    statusText.classList.remove("victory");
+    statusText.style.color = "";
+  } else if (winner) {
+    statusText.textContent = `Joueur ${getPlayerLabel(winner)} a gagné !`;
+    statusText.classList.add("victory");
+    statusText.style.color = winner === "X" ? "gold" : "lightgray";
+
+    triggerExplosion(winner === "X" ? "gold" : "lightgray");
   } else {
     currentPlayer = currentPlayer === "X" ? "O" : "X";
-    statusText.textContent = `À ${currentPlayer} de jouer`;
+    statusText.textContent = `À ${getPlayerLabel(currentPlayer)} de jouer`;
   }
+  // Change la classe du curseur selon le joueur
+  board.classList.remove("star-cursor", "moon-cursor");
+  board.classList.add(currentPlayer === "X" ? "star-cursor" : "moon-cursor");
 }
 
 function resetGame() {
   grid = Array(9).fill(null);
   currentPlayer = "X";
-  if (!statusText) return;
-  statusText.textContent = "Joueur X commence";
+  statusText.textContent = "Joueur étoile commence";
+  statusText.classList.remove("victory");
+  statusText.style.color = "";
   board.querySelectorAll(".cell").forEach((cell) => {
     cell.textContent = "";
     cell.classList.remove("taken");
   });
+  board.classList.remove("moon-cursor");
+  board.classList.add("star-cursor"); // car X commence (étoile)
 }
 
 function createBoard() {
@@ -66,6 +87,31 @@ function createBoard() {
     cell.addEventListener("click", handleClick);
     board.appendChild(cell);
   }
+}
+
+function triggerExplosion(color) {
+  const container = document.getElementById("explosion-container");
+  container.innerHTML = "";
+
+  for (let i = 0; i < 25; i++) {
+    const particle = document.createElement("div");
+    particle.className = "particle";
+    particle.style.borderBottomColor = color;
+
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = 150 + Math.random() * 100;
+    const x = Math.cos(angle) * distance + "px";
+    const y = Math.sin(angle) * distance + "px";
+
+    particle.style.setProperty("--x", x);
+    particle.style.setProperty("--y", y);
+
+    container.appendChild(particle);
+  }
+
+  setTimeout(() => {
+    container.innerHTML = "";
+  }, 3000);
 }
 
 resetBtn.addEventListener("click", resetGame);
